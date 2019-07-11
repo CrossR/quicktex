@@ -16,13 +16,13 @@ function! quicktex#mathmode#InMathMode()
     let lines[-1] = strpart(lines[-1], 0, col('.')-1)
     let lines     = join(lines, '')
     " Remove escaped backslashes to avoid something line \\(
-    let lines     = substitute(lines, '\\\\', '', 'g')
+    let escapedLines     = substitute(lines, '\\\\', '', 'g')
 
     for [begin, end] in s:mathModes
         " Remove the part of the string up to the ending delimiter
-        let lines = strpart(lines, strridx(lines, end)+1)
+        let loopLines = strpart(escapedLines, strridx(escapedLines, end)+1)
         " Check if a corresponding beginning delimiter is left in the string
-        if stridx(lines, begin)+1
+        if stridx(loopLines, begin)+1
             return 1
         endif
     endfor
@@ -31,9 +31,9 @@ function! quicktex#mathmode#InMathMode()
     " dollar signs. Then, compare string lengths before and after removing
     " all dollar signs. This will be the total number of dollar signs. If this
     " total is odd, you're in math mode. Otherwise, you're not.
-    let lines        = substitute(lines, '\\\$', '', 'g')
-    let lines        = substitute(lines, '\$\$', '$', 'g')
-    let beforelength = strlen(lines)
-    let afterlength  = strlen(substitute(lines, '\$', '', 'g'))
+    let dollarLines = substitute(escapedLines, '\\\$', '', 'g')
+    let dollarLines = substitute(dollarLines, '\$\$', '$', 'g')
+    let beforelength = strlen(dollarLines)
+    let afterlength  = strlen(substitute(dollarLines, '\$', '', 'g'))
     return (beforelength - afterlength) % 2
 endfunction
